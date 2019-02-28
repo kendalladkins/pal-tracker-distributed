@@ -11,6 +11,12 @@ using Pivotal.Discovery.Client;
 using Steeltoe.Common.Discovery;
 using Steeltoe.CircuitBreaker.Hystrix;
 
+using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Steeltoe.Security.Authentication.CloudFoundry;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 namespace TimesheetsServer
 {
     public class Startup
@@ -25,8 +31,23 @@ namespace TimesheetsServer
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
             // Add framework services.
-            services.AddMvc();
+            services.AddMvc(mvcOptions =>
+            {
+                if (!Configuration.GetValue("DISABLE_AUTH", false))
+                {
+                    // Set Authorized as default policy
+                    var policy = new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
+                    .RequireAuthenticatedUser()
+                    .RequireClaim("scope", "uaa.resource")
+                    .Build();
+                    mvcOptions.Filters.Add(new AuthorizeFilter(policy));
+                }
+            });
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                 .AddCloudFoundryJwtBearer(Configuration);
 
             services.AddDbContext<TimeEntryContext>(options => options.UseMySql(Configuration));
             services.AddScoped<ITimeEntryDataGateway, TimeEntryDataGateway>();
@@ -40,10 +61,10 @@ namespace TimesheetsServer
                 };
 
                 var logger = sp.GetService<ILogger<ProjectClient>>();
-                return new ProjectClient(httpClient, logger);
-
+                var contextAccessor = sp.GetService<IHttpContextAccessor>();
+                return new ProjectClient(httpClient, logger, () => contextAccessor.HttpContext.GetTokenAsync("access_token"));
             });
-            
+
             services.AddHystrixMetricsStream(Configuration);
         }
 

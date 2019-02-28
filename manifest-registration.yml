@@ -9,3 +9,6 @@ applications:
   services:
   - tracker-registration-database
   - tracker-service-registry
+  - tracker-sso
+  env:
+    GRANT_TYPE: client_credentials
