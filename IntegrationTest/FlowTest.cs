@@ -18,6 +18,8 @@ namespace IntegrationTest
         private readonly AppServer _backlogServer;
         private readonly AppServer _timesheetsServer;
 
+        private readonly AppServer _claimServer;
+
         public FlowTest()
         {
             _registrationServer = TestAppServerBuilder()
@@ -62,8 +64,28 @@ namespace IntegrationTest
                 .SetEnvironmentVariable("SPRING__CLOUD__CONFIG__ENABLED", "false")
                 .SetEnvironmentVariable("SPRING__CLOUD__CONFIG__FAILFAST", "false")                
                 .Build();
+
+            _claimServer = TestAppServerBuilder()
+                .AppName("ClaimServer")
+                .Port(8885)
+                .Database("tracker_claim_dotnet_test")
+                .SetEnvironmentVariable("REGISTRATION_SERVER_ENDPOINT", _registrationServer.Url())
+                .SetEnvironmentVariable("EUREKA__CLIENT__SHOULDFETCHREGISTRY", "false")
+                .SetEnvironmentVariable("DISABLE_AUTH", "true")
+                .SetEnvironmentVariable("SPRING__CLOUD__CONFIG__ENABLED", "false")
+                .SetEnvironmentVariable("SPRING__CLOUD__CONFIG__FAILFAST", "false")                
+                .Build();
         }
 
+        [Fact]
+        public void TestClaimFlow() {
+            _claimServer.Start();
+
+            HttpResponseMessage response;
+            
+            response = _httpClient.Get(_claimServer.Url());
+            Assert.Equal("Noop!", response.Content.ReadAsStringAsync().Result);
+        }
         [Fact]
         public void TestBasicFlow()
         {

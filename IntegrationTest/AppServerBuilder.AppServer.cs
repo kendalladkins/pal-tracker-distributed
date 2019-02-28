@@ -48,6 +48,9 @@ namespace IntegrationTest
 
             public void Start()
             {
+                Console.WriteLine("******** STARTING");
+                Debug.WriteLine("########");
+
                 if (!File.Exists(_dllPath))
                 {
                     throw new InvalidOperationException($"File {_dllPath} does not exist. Run 'dotnet build' to rebuild the application.");

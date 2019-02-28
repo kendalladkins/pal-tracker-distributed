@@ -16,5 +16,6 @@
       <ProjectReference Include="../Applications/BacklogServer/BacklogServer.csproj" />
       <ProjectReference Include="../Applications/RegistrationServer/RegistrationServer.csproj" />
       <ProjectReference Include="../Applications/TimesheetsServer/TimesheetsServer.csproj" />
+      <ProjectReference Include="../Applications/ClaimServer/ClaimServer.csproj" />
   </ItemGroup>
 </Project>

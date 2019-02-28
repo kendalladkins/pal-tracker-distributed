@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using MySql.Data.MySqlClient;
+using System;
 
 namespace TestSupport
 {
@@ -10,6 +11,8 @@ namespace TestSupport
         public static string BacklogConnectionString => ConnectionString("tracker_backlog_dotnet_test");
         public static string AllocationsConnectionString => ConnectionString("tracker_allocations_dotnet_test");
         public static string TimesheetsConnectionString => ConnectionString("tracker_timesheets_dotnet_test");
+
+        public static string ClaimConnectionString => ConnectionString("tracker_claim_dotnet_test");
 
         private const string DbUser = "tracker_dotnet";
         private const string DbPassword = "password";
@@ -71,6 +74,9 @@ namespace TestSupport
 
         public void TruncateAllTables()
         {
+            
+            Console.WriteLine("**********************");
+            Console.WriteLine("**********************");
             var dbName = new MySqlConnectionStringBuilder(_connectionString).Database;
 
             var tableNameSql = $@"set foreign_key_checks = 0;
@@ -78,6 +84,10 @@ namespace TestSupport
                 where table_schema='{dbName}' and table_name != 'schema_version';";
 
             var truncateSql = "";
+            
+            Console.WriteLine("**********************");
+            Console.WriteLine(tableNameSql);
+            Console.WriteLine("**********************");
 
             using (var connection = new MySqlConnection(_connectionString))
             {
