@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -e
+export DISABLE_AUTH=true
 
 declare -a apps=( "Registration" "Allocations" "Backlog" "Timesheets" )
 declare -a ports=( 8883 8881 8882 8884 )

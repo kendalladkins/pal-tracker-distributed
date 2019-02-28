@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Allocations
 {
@@ -14,7 +15,7 @@ namespace Allocations
             _gateway = gateway;
             _client = client;
         }
-
+        
         [HttpGet]
         public IActionResult Get([FromQuery] int projectId)
         {
